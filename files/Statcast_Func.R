@@ -168,7 +168,20 @@ combine_stat_with_xlxs <- function(ID,address){
 
 #투수 함수
 
-#공식: hits/(전체-볼)
+#공식: babip * hits/(전체-볼)
+
+
+#Babip 추출
+
+convert_to_BAbip <- function(name1){
+  temp <- bref_daily_pitcher("2022-04-07","2022-10-05")
+  result <- as.numeric(temp %>% filter(Name == name1) %>% select(BAbip) %>% slice(1))
+  return(result)
+}
+
+
+
+
 convert_to_statcast_22_pitcher <- function(id){
   temp <-  statcast_search("2022-04-07","2022-10-05", playerid = id,player_type = 'pitcher')
   result <- temp %>% select(c("player_name","pitch_type","release_speed","events","description","zone","p_throws","stand","type","bb_type"))
@@ -255,21 +268,23 @@ convert_to_vs_batter <- function(ID){
   else{
     year = 22
   }
+  #공식 : 안타 * BAbip/(전체-볼)
+  BAbip <- convert_to_BAbip(name)
   
-  R_SL_ratio <- convert_to_ratio(data4,"R",c("SL","FC"))
-  R_FAl_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"l")
-  R_FAs_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"s")
-  R_FTl_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"l")
-  R_FTs_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"s")
-  R_CU_ratio <- convert_to_ratio(data4,"R",c("CU"))
-  R_CH_ratio <- convert_to_ratio(data4,"R",c("CH"))
-  L_SL_ratio <- convert_to_ratio(data4,"L",c("SL","FC"))
-  L_FAl_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"l")
-  L_FAs_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"s")
-  L_FTl_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"l")
-  L_FTs_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"s")
-  L_CU_ratio <- convert_to_ratio(data4,"L",c("CU"))
-  L_CH_ratio <- convert_to_ratio(data4,"L",c("CH"))
+  R_SL_ratio <- convert_to_ratio(data4,"R",c("SL","FC"))*BAbip
+  R_FAl_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"l")*BAbip
+  R_FAs_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"s")*BAbip
+  R_FTl_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"l")*BAbip
+  R_FTs_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"s")*BAbip
+  R_CU_ratio <- convert_to_ratio(data4,"R",c("CU"))*BAbip
+  R_CH_ratio <- convert_to_ratio(data4,"R",c("CH"))*BAbip
+  L_SL_ratio <- convert_to_ratio(data4,"L",c("SL","FC"))*BAbip
+  L_FAl_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"l")*BAbip
+  L_FAs_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"s")*BAbip
+  L_FTl_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"l")*BAbip
+  L_FTs_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"s")*BAbip
+  L_CU_ratio <- convert_to_ratio(data4,"L",c("CU"))*BAbip
+  L_CH_ratio <- convert_to_ratio(data4,"L",c("CH"))*BAbip
   
   result <- c(name = name,
               pitcher_id = ID,
