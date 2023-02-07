@@ -272,19 +272,19 @@ convert_to_vs_batter <- function(ID){
   BAbip <- convert_to_BAbip(name)
   
   R_SL_ratio <- convert_to_ratio(data4,"R",c("SL","FC"))*BAbip
-  R_FAl_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"l")*BAbip
-  R_FAs_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"s")*BAbip
-  R_FTl_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"l")*BAbip
-  R_FTs_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"s")*BAbip
-  R_CU_ratio <- convert_to_ratio(data4,"R",c("CU"))*BAbip
-  R_CH_ratio <- convert_to_ratio(data4,"R",c("CH"))*BAbip
-  L_SL_ratio <- convert_to_ratio(data4,"L",c("SL","FC"))*BAbip
-  L_FAl_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"l")*BAbip
-  L_FAs_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"s")*BAbip
-  L_FTl_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"l")*BAbip
-  L_FTs_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"s")*BAbip
-  L_CU_ratio <- convert_to_ratio(data4,"L",c("CU"))*BAbip
-  L_CH_ratio <- convert_to_ratio(data4,"L",c("CH"))*BAbip
+  R_FAl_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"l")*BAbip*10
+  R_FAs_ratio <- convert_to_ratio_fastball(data4,"R",c("FA","FF"),"s")*BAbip*10
+  R_FTl_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"l")*BAbip*10
+  R_FTs_ratio <- convert_to_ratio_fastball(data4,"R",c("FT","FS","SI"),"s")*BAbip*10
+  R_CU_ratio <- convert_to_ratio(data4,"R",c("CU"))*BAbip*10
+  R_CH_ratio <- convert_to_ratio(data4,"R",c("CH"))*BAbip*10
+  L_SL_ratio <- convert_to_ratio(data4,"L",c("SL","FC"))*BAbip*10
+  L_FAl_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"l")*BAbip*10
+  L_FAs_ratio <- convert_to_ratio_fastball(data4,"L",c("FA","FF"),"s")*BAbip*10
+  L_FTl_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"l")*BAbip*10
+  L_FTs_ratio <- convert_to_ratio_fastball(data4,"L",c("FT","FS","SI"),"s")*BAbip*10
+  L_CU_ratio <- convert_to_ratio(data4,"L",c("CU"))*BAbip*10
+  L_CH_ratio <- convert_to_ratio(data4,"L",c("CH"))*BAbip*10
   
   result <- c(name = name,
               pitcher_id = ID,
@@ -312,4 +312,129 @@ combine_stat_with_xlxs_pitcher <- function(ID2,address){
   temp <- read_excel(address)
   pitcher_tibble <-  bind_cols(temp, convert_to_vs_batter(ID2))
   write_xlsx(pitcher_tibble, address)
+}
+
+# 패스트볼 제외 타자별 구종 개수
+
+convert_to_percentage_pitcher<- function(data1,stand1,p_type1){
+  pitch_count <- nrow(filter(data1, (stand==stand1) & (pitch_type %in% p_type1)))
+  return(pitch_count)
+}
+
+# 패스트볼 타자별 구종 개수
+
+convert_to_percentage_pitcher_fastball<- function(data2,stand2,p_type2,velocity2){
+  if (velocity2=='l'){
+    sum <- nrow(filter(data2, stand==stand2 &(release_speed >= 95) & pitch_type %in% p_type2))
+    return(sum)
+  }
+  else{
+    sum <- nrow(filter(data2, stand==stand2 &(release_speed < 95) & pitch_type %in% p_type2))
+    return(sum)
+  }
+}
+
+#투수의 (우 or 좌) 타자별 구종 퍼센티지
+
+convert_to_percentage <- function(ID3){
+  
+  #데이터 불러오기
+  data2 <- convert_to_statcast_22_pitcher(ID3)
+  data2 <- tibble(data2)
+  
+  #총 던진 횟수
+  sum <- nrow(filter(data2,pitch_type != "EP")) 
+  
+  if (sum<1000){
+    year = 0
+  }
+  else{
+    year = 22}
+  
+  
+  #이름
+  name <- data2 %>% pull(player_name)
+  name <- gsub(",", "", name)
+  words <- strsplit(name, " ")[[1]]
+  reversed_words <- rev(words)
+  name <- paste(reversed_words, collapse = " ")
+  
+  #각 구종별, 타자별 퍼센티지
+  R_SL_percentage <- convert_to_percentage_pitcher(data2,"R",c("SL","FC"))/sum*100
+  R_FAl_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FA","FF"),'l')/sum*100
+  R_FAs_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FA","FF"),'s')/sum*100
+  R_FTl_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FT","FS","SI"),'l')/sum*100
+  R_FTs_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FT","FS","SI"),'s')/sum*100
+  R_CU_percentage <- convert_to_percentage_pitcher(data2,"R",c("CU"))/sum*100
+  R_CH_percentage <- convert_to_percentage_pitcher(data2,"R",c("CH"))/sum*100
+  L_SL_percentage <- convert_to_percentage_pitcher(data2,"L",c("SL","FC"))/sum*100
+  L_FAl_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FA","FF"),'l')/sum*100
+  L_FAs_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FA","FF"),'s')/sum*100
+  L_FTl_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FT","FS","SI"),'l')/sum*100
+  L_FTs_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FT","FS","SI"),'s')/sum*100
+  L_CU_percentage <- convert_to_percentage_pitcher(data2,"L",c("CU"))/sum*100
+  L_CH_percentage <- convert_to_percentage_pitcher(data2,"L",c("CH"))/sum*100
+  
+  result <- c(name = name,
+              pitcher_id = ID3,
+              AB = sum,
+              Year = year,
+              R_SL = R_SL_percentage,
+              R_FAl = R_FAl_percentage,
+              R_FAs = R_FAs_percentage,
+              R_FTl = R_FTl_percentage,
+              R_FTs = R_FTs_percentage,
+              R_CU = R_CU_percentage,
+              R_CH = R_CH_percentage,
+              L_SL = L_SL_percentage,
+              L_FAl = L_FAl_percentage,
+              L_FAs = L_FAs_percentage,
+              L_FTl = L_FTl_percentage,
+              L_FTs = L_FTs_percentage,
+              L_CU = L_CU_percentage,
+              L_CH = L_CH_percentage)
+  return(result)
+}
+
+
+# 투수 통합 구종 타자별 ratio * percentage
+convert_to_ultimate_pitcher <- function(ID4){
+  ratio <- convert_to_vs_batter(ID4)
+  percentage <- convert_to_percentage(ID4)
+  R_SL_ultimate <- ifelse(as.numeric(percentage["R_SL"])>0,as.numeric(ratio["R_SL"])*as.numeric(percentage["R_SL"]),-1)
+  R_FAl_ultimate <- ifelse(as.numeric(percentage["R_FAl"])>0,as.numeric(ratio["R_FAl"])*as.numeric(percentage["R_FAl"]),-1)
+  R_FAs_ultimate <- ifelse(as.numeric(percentage["R_FAs"])>0,as.numeric(ratio["R_FAs"])*as.numeric(percentage["R_FAs"]),-1)
+  R_FTl_ultimate <- ifelse(as.numeric(percentage["R_FTl"])>0,as.numeric(ratio["R_FTl"])*as.numeric(percentage["R_FTl"]),-1)
+  R_FTs_ultimate <- ifelse(as.numeric(percentage["R_FTs"])>0,as.numeric(ratio["R_FTs"])*as.numeric(percentage["R_FTs"]),-1)
+  R_CU_ultimate <- ifelse(as.numeric(percentage["R_CU"])>0,as.numeric(ratio["R_CU"])*as.numeric(percentage["R_CU"]),-1)
+  R_CH_ultimate <- ifelse(as.numeric(percentage["R_CH"])>0,as.numeric(ratio["R_CH"])*as.numeric(percentage["R_CH"]),-1)
+  L_SL_ultimate <- ifelse(as.numeric(percentage["L_SL"])>0,as.numeric(ratio["L_SL"])*as.numeric(percentage["L_SL"]),-1)
+  L_FAl_ultimate <- ifelse(as.numeric(percentage["L_FAl"])>0,as.numeric(ratio["L_FAl"])*as.numeric(percentage["L_FAl"]),-1)
+  L_FAs_ultimate <- ifelse(as.numeric(percentage["L_FAs"])>0,as.numeric(ratio["L_FAs"])*as.numeric(percentage["L_FAs"]),-1)
+  L_FTl_ultimate <- ifelse(as.numeric(percentage["L_FTl"])>0,as.numeric(ratio["L_FTl"])*as.numeric(percentage["L_FTl"]),-1)
+  L_FTs_ultimate <- ifelse(as.numeric(percentage["L_FTs"])>0,as.numeric(ratio["L_FTs"])*as.numeric(percentage["L_FTs"]),-1)
+  L_CU_ultimate <- ifelse(as.numeric(percentage["L_CU"])>0,as.numeric(ratio["L_CU"])*as.numeric(percentage["L_CU"]),-1)
+  L_CH_ultimate <- ifelse(as.numeric(percentage["L_CH"])>0,as.numeric(ratio["L_CH"])*as.numeric(percentage["L_CH"]),-1)
+  
+  
+  
+  result <- c(name = ratio["name"],
+              pitcher_id = ratio["pitcher_id"],
+              AB = ratio["AB"],
+              Year = ratio["Year"],
+              R_SL = R_SL_ultimate,
+              R_FAl = R_FAl_ultimate,
+              R_FAs = R_FAs_ultimate,
+              R_FTl = R_FTl_ultimate,
+              R_FTs = R_FTs_ultimate,
+              R_CU = R_CU_ultimate,
+              R_CH = R_CH_ultimate,
+              L_SL = L_SL_ultimate,
+              L_FAl = L_FAl_ultimate,
+              L_FAs = L_FAs_ultimate,
+              L_FTl = L_FTl_ultimate,
+              L_FTs = L_FTs_ultimate,
+              L_CU = L_CU_ultimate,
+              L_CH = L_CH_ultimate)
+  return(result)
 }
