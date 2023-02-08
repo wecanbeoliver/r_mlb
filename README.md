@@ -4,39 +4,39 @@
 
 # #타자 
 
-##     \#(왼 of 오)른손 잡이별, 구종별 상대 성적
+## \#(왼 of 오)른손 잡이별, 구종별 상대 성적
 
-##       `convert_to_vs_batter(id)`
+## `convert_to_vs_batter(id)`
 
-###          #데이터 
+### #데이터 
 
-###          `convert_to_statcast_22_batter(id)`
+### `convert_to_statcast_22_batter(id)`
 
-###          #패스트볼 제외 
+### #패스트볼 제외 
 
-###          `convert_to_value(data,p_throws,p_type)` 
+### `convert_to_value(data,p_throws,p_type)` 
 
-####              #홈런, 안타, 사구, 볼넷      
+### #홈런, 안타, 사구, 볼넷      
 
-####              `convert_to_events(data,p_throws,p_type,events)` 
+### `convert_to_events(data,p_throws,p_type,events)` 
 
-####              #볼 
+### #볼 
 
-####              `convert_to_filter(data3,p_throws3,p_type3)` 
+### `convert_to_filter(data3,p_throws3,p_type3)` 
 
-######                          (홈런:1.7, 3루타:1.37, 2루타:1.08, 안타:0.77, 사구:0.65, 볼넷:0.62, 거른 볼:0.1) 출처:나무위키
+###### (홈런:1.7, 3루타:1.37, 2루타:1.08, 안타:0.77, 사구:0.65, 볼넷:0.62, 거른 볼:0.1) 출처:나무위키
 
-###           #패스트볼 
+###### #패스트볼 
 
-###               `convert_to_fastball_value(data,p_throws,p_type,velocity)` 
+###           `convert_to_fastball_value(data,p_throws,p_type,velocity)` 
 
-####                #홈런, 안타, 사구, 볼넷 
+### #홈런, 안타, 사구, 볼넷 
 
-####                 `convert_to_fastball_events(data,p_throws,p_type,events,velocity)` 
+####                `convert_to_fastball_events(data,p_throws,p_type,events,velocity)`
 
-####                #볼 
+#### #볼 
 
-####                `convert_to_fastball_filter(data,p_throws,p_type,velocity)`
+####               `convert_to_fastball_filter(data,p_throws,p_type,velocity)`
 
 #엑셀 파일에 선수 스탯 추가하기
 
