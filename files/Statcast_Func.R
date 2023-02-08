@@ -286,7 +286,7 @@ convert_to_vs_batter <- function(ID){
   L_CU_ratio <- convert_to_ratio(data4,"L",c("CU"))*BAbip*10
   L_CH_ratio <- convert_to_ratio(data4,"L",c("CH"))*BAbip*10
   
-  result <- c(name = name,
+  result <- tibble(name = name,
               pitcher_id = ID,
               AB = sum,
               Year = year,
@@ -334,7 +334,7 @@ convert_to_percentage_pitcher_fastball<- function(data2,stand2,p_type2,velocity2
   }
 }
 
-#투수의 (우 or 좌) 타자별 구종 퍼센티지
+#투수의 (우 or 좌) 타자별 구종 퍼센티지 (5퍼센트 이하 폐지)
 
 convert_to_percentage <- function(ID3){
   
@@ -361,21 +361,35 @@ convert_to_percentage <- function(ID3){
   
   #각 구종별, 타자별 퍼센티지
   R_SL_percentage <- convert_to_percentage_pitcher(data2,"R",c("SL","FC"))/sum*100
+  R_SL_percentage <- ifelse(R_SL_percentage>=5,R_SL_percentage,0)
   R_FAl_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FA","FF"),'l')/sum*100
+  R_FAl_percentage <- ifelse(R_FAl_percentage>=5,R_FAl_percentage,0)
   R_FAs_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FA","FF"),'s')/sum*100
+  R_FAs_percentage <- ifelse(R_FAs_percentage>=5,R_FAs_percentage,0)
   R_FTl_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FT","FS","SI"),'l')/sum*100
+  R_FTl_percentage <- ifelse(R_FTl_percentage>=5,R_FTl_percentage,0)
   R_FTs_percentage <- convert_to_percentage_pitcher_fastball(data2,"R",c("FT","FS","SI"),'s')/sum*100
+  R_FTs_percentage <- ifelse(R_FTs_percentage>=5,R_FTs_percentage,0)
   R_CU_percentage <- convert_to_percentage_pitcher(data2,"R",c("CU"))/sum*100
+  R_CU_percentage <- ifelse(R_CU_percentage>=5,R_CU_percentage,0)
   R_CH_percentage <- convert_to_percentage_pitcher(data2,"R",c("CH"))/sum*100
+  R_CH_percentage <- ifelse(R_CH_percentage>=5,R_CH_percentage,0)
   L_SL_percentage <- convert_to_percentage_pitcher(data2,"L",c("SL","FC"))/sum*100
+  L_SL_percentage <- ifelse(L_SL_percentage>=5,L_SL_percentage,0)
   L_FAl_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FA","FF"),'l')/sum*100
+  L_FAl_percentage <- ifelse(L_FAl_percentage>=5,L_FAl_percentage,0)
   L_FAs_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FA","FF"),'s')/sum*100
+  L_FAs_percentage <- ifelse(L_FAs_percentage>=5,L_FAs_percentage,0)
   L_FTl_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FT","FS","SI"),'l')/sum*100
+  L_FTl_percentage <- ifelse(L_FTl_percentage>=5,L_FTl_percentage,0)
   L_FTs_percentage <- convert_to_percentage_pitcher_fastball(data2,"L",c("FT","FS","SI"),'s')/sum*100
+  L_FTs_percentage <- ifelse(L_FTs_percentage>=5,L_FTs_percentage,0)
   L_CU_percentage <- convert_to_percentage_pitcher(data2,"L",c("CU"))/sum*100
+  L_CU_percentage <- ifelse(L_CU_percentage>=5,L_CU_percentage,0)
   L_CH_percentage <- convert_to_percentage_pitcher(data2,"L",c("CH"))/sum*100
+  L_CH_percentage <- ifelse(L_CH_percentage>=5,L_CH_percentage,0)
   
-  result <- c(name = name,
+  result <- tibble(name = name,
               pitcher_id = ID3,
               AB = sum,
               Year = year,
@@ -399,6 +413,7 @@ convert_to_percentage <- function(ID3){
 
 # 투수 통합 구종 타자별 ratio * percentage
 convert_to_ultimate_pitcher <- function(ID4){
+  
   ratio <- convert_to_vs_batter(ID4)
   percentage <- convert_to_percentage(ID4)
   R_SL_ultimate <- ifelse(as.numeric(percentage["R_SL"])>0,as.numeric(ratio["R_SL"])*as.numeric(percentage["R_SL"]),-1)
@@ -416,12 +431,25 @@ convert_to_ultimate_pitcher <- function(ID4){
   L_CU_ultimate <- ifelse(as.numeric(percentage["L_CU"])>0,as.numeric(ratio["L_CU"])*as.numeric(percentage["L_CU"]),-1)
   L_CH_ultimate <- ifelse(as.numeric(percentage["L_CH"])>0,as.numeric(ratio["L_CH"])*as.numeric(percentage["L_CH"]),-1)
   
+  table <- c("R_SL","R_FAl","R_FAs","R_FTl","R_FTs","R_CU","R_CH","L_SL","L_FAl","L_FAs","L_FTl","L_FTs","L_CU","L_CH")
   
   
-  result <- c(name = ratio["name"],
-              pitcher_id = ratio["pitcher_id"],
-              AB = ratio["AB"],
-              Year = ratio["Year"],
+  sum <- 0
+  
+  
+  for (i in table){
+    temp <- ifelse(as.numeric(percentage[i])>0,as.numeric(ratio[i])*as.numeric(percentage[i]),0)
+    sum = sum+temp
+  }
+  
+  Name <- as.character(ratio["name"])
+  Year <- as.numeric(ratio["Year"])
+  AB <- as.numeric(ratio["AB"])
+  
+  result <- tibble(name = Name,
+              pitcher_id = ID4,
+              AB = AB,
+              Year = Year,
               R_SL = R_SL_ultimate,
               R_FAl = R_FAl_ultimate,
               R_FAs = R_FAs_ultimate,
@@ -435,6 +463,7 @@ convert_to_ultimate_pitcher <- function(ID4){
               L_FTl = L_FTl_ultimate,
               L_FTs = L_FTs_ultimate,
               L_CU = L_CU_ultimate,
-              L_CH = L_CH_ultimate)
+              L_CH = L_CH_ultimate,
+              Sum = sum)
   return(result)
 }
