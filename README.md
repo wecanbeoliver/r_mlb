@@ -28,24 +28,78 @@
 
 ###### #패스트볼 
 
-###           `convert_to_fastball_value(data,p_throws,p_type,velocity)` 
+### `convert_to_fastball_value(data,p_throws,p_type,velocity)` 
 
 ### #홈런, 안타, 사구, 볼넷 
 
-####                `convert_to_fastball_events(data,p_throws,p_type,events,velocity)`
+#### `convert_to_fastball_events(data,p_throws,p_type,events,velocity)`
 
 #### #볼 
 
-####               `convert_to_fastball_filter(data,p_throws,p_type,velocity)`
+#### `convert_to_fastball_filter(data,p_throws,p_type,velocity)`
 
-#엑셀 파일에 선수 스탯 추가하기
+## #엑셀 파일에 선수 스탯 추가하기
 
-combine_stat_with_xlxs(ID,address)
+## combine_stat_with_xlxs(ID,address)
 
-#투수
+# #투수
 
-#투수 타자별, 구종별 ratio #공식: babip \* hits/(전체-볼) convert_to_vs_batter
+## #투수 타자별, 구종별 ratio
+
+## #convert_to_vs_batter(ID)
+
+###### 공식: BAbip \* hits/(전체-볼) convert_to_vs_batter
+
+### #데이터 생성
+### #convert_to_statcast_22_pitcher(ID)
+
+### #BAbip 추출
+### convert_to_BAbip(name)
+
+### #투수 비율 측정(패스트볼 제외)
+### convert_to_ratio(data,stand,p_type)
+
+#### #안타 이상 개수
+#### convert_to_hits_pitcher(data,stand,p_type)
+
+#### #전체-볼
+#### convert_to_ab_except_ball(data,stand,p_type)
+
+### #투수 비율 측정(패스트볼)
+### convert_to_ratio_fastball(data,stand,p_type,velocity)
+
+#### #투수 비율 측정(패스트볼)
+#### convert_to_hits_pitcher_fastball(data,stand,p_type,velocity)
+
+#### #전체-볼
+#### convert_to_ab_except_ball_fastball(data,stand,p_type,velocity)
+
+## #투수 ratio 엑셀 
+## combine_stat_with_xlxs_pitcher(id,address)
+
+## #투수의 (우 or 좌) 타자별 구종 퍼센티지 (5퍼센트 이하 폐지)
+## convert_to_percentage(id)
+
+### #데이터 생성
+### #convert_to_statcast_22_pitcher(ID)
+
+### #각 구종별, 타자별 퍼센티지(패스트볼 제외)
+### convert_to_percentage_pitcher(data,stand,p_type)
+
+
+### #각 구종별, 타자별 퍼센티지(패스트볼 제외)
+### convert_to_percentage_pitcher_fastball(data,stand,p_type,velocity)
+
+
+## # 투수 통합 구종 타자별 ratio * percentage
+## convert_to_ultimate_pitcher(id)
+
+### #투수 타자별, 구종별 ratio
+### #convert_to_vs_batter(ID)
+
+### #투수의 (우 or 좌) 타자별 구종 퍼센티지 (5퍼센트 이하 폐지)
+### convert_to_percentage(id)
 
 ## **License**
 
-The **`baseballr`** package is released under the [**MIT License**](https://chat.openai.com/LICENSE).
+The **`baseballr`** package is released under the [**MIT License**].
