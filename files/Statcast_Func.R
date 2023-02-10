@@ -30,8 +30,15 @@ convert_to_value <- function(data3,p_throws3,p_type3){
   walk <- convert_to_events(data3,p_throws3,p_type3,c("walk"))
   filter_ball <- convert_to_filter(data3,p_throws3,p_type3)
   
+  sum <- (nrow(filter(data3, p_throws==p_throws3 & pitch_type %in% p_type3)))
+  
+  
   value <- 1.7*homerun+1.37*triple+1.08*double+0.77*single+0.65*hit_by_pitch+0.62*walk+0.1*filter_ball
-  return(100*value/(nrow(filter(data3, p_throws==p_throws3 & pitch_type %in% p_type3))))
+  
+  if(sum<30){
+    return(-1)
+  }
+  return(100*value/sum)
 }
 
 #속도 구분이 있는 패스트볼
@@ -68,12 +75,18 @@ convert_to_fastball_value <- function(data6,p_throws6,p_type6,speed6){
   walk <- convert_to_fastball_events(data6,p_throws6,p_type6,c("walk"),speed6)
   filter_ball <- convert_to_fastball_filter(data6,p_throws6,p_type6,speed6)
   
+  sum <- (nrow(filter(data6, release_speed<95 & p_throws==p_throws6 & pitch_type %in% p_type6)))
+  
+  if(sum<30){
+    return(-1)
+  }
+  
   value <- 1.7*homerun+1.37*triple+1.08*double+0.77*single+0.65*hit_by_pitch+0.62*walk+0.1*filter_ball
   if (speed6=="l"){
-    return(100*value/(nrow(filter(data6, release_speed>=95 & p_throws==p_throws6 & pitch_type %in% p_type6))))
+    return(100*value/sum)
   }
   else{
-    return(100*value/(nrow(filter(data6, release_speed<95 & p_throws==p_throws6 & pitch_type %in% p_type6))))
+    return(100*value/sum)
   }
 }
 
@@ -134,7 +147,7 @@ convert_to_vs_pitch_type <- function(id){
   reversed_words <- rev(words)
   name <- paste(reversed_words, collapse = " ")
   
-  result <- c(name = name,
+  result <- tibble(name = name,
               batter_id = id,
               AB = sum,
               Year = year,
@@ -413,7 +426,7 @@ convert_to_percentage <- function(ID3){
 
 # 투수 통합 구종 타자별 ratio * percentage
 convert_to_ultimate_pitcher <- function(ID4){
-  
+  # 
   ratio <- convert_to_vs_batter(ID4)
   percentage <- convert_to_percentage(ID4)
   R_SL_ultimate <- ifelse(as.numeric(percentage["R_SL"])>0,as.numeric(ratio["R_SL"])*as.numeric(percentage["R_SL"]),-1)
